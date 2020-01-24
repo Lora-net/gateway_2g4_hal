@@ -109,9 +109,21 @@ int main(int argc, char **argv) {
         return EXIT_FAILURE;
     }
 
-    x = mcu_reset(fd, true);
+    x = mcu_reset(fd, RESET_TYPE__RX_ALL);
     if (x != 0) {
-        printf("ERROR: failed to ping the concentrator\n");
+        printf("ERROR: failed to reset the concentrator RX radios\n");
+        return EXIT_FAILURE;
+    }
+
+    x = mcu_reset(fd, RESET_TYPE__TX);
+    if (x != 0) {
+        printf("ERROR: failed to reset the concentrator TX radio\n");
+        return EXIT_FAILURE;
+    }
+
+    x = mcu_reset(fd, RESET_TYPE__GTW);
+    if (x != 0) {
+        printf("ERROR: failed to reset the concentrator MCU\n");
         return EXIT_FAILURE;
     }
 

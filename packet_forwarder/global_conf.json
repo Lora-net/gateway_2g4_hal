@@ -33,7 +33,7 @@
     "gateway_conf": {
         "gateway_ID": "auto",
         /* change with default server address/ports */
-        "server_address": "35.204.120.252",
+        "server_address": "localhost",
         "serv_port_up": 1700,
         "serv_port_down": 1700,
         /* adjust the following parameters for your network */

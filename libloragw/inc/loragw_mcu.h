@@ -291,7 +291,7 @@ int mcu_config_rx(int fd, uint8_t channel, const struct lgw_conf_channel_rx_s * 
 
 int mcu_receive(int fd, uint8_t max_pkt, struct lgw_pkt_rx_s * pkt, uint8_t * nb_pkt);
 
-int mcu_reset(int fd, bool reset_mcu);
+int mcu_reset(int fd, e_reset_type reset_type);
 
 int mcu_boot(int fd);
 

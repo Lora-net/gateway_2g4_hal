@@ -64,13 +64,13 @@ void usage(void) {
     printf(" -h print this help\n");
     printf(" -d <path>  TTY device to be used to access the concentrator board\n");
     printf("                      => default path: " TTY_PATH_DEFAULT "\n");
-    printf(" -f <float> Radio TX frequency in MHz\n");
+    printf(" -f <float> Radio TX frequency in MHz, ]2400..2500[\n");
     printf(" -s <uint>  LoRa datarate 0:random, [5..12]\n");
     printf(" -b <uint>  LoRa bandwidth in khz 0:random, [200, 400, 800, 1600]\n");
     printf(" -l <uint>  LoRa preamble length, [6..61440]\n");
     printf(" -n <uint>  Number of packets to be sent\n");
     printf(" -z <uint>  size of packets to be sent 0:random, [9..255], 0 for all sizes [szmin..szmax]\n");
-    printf(" -p <int>   RF power in dBm\n");
+    printf(" -p <int>   RF power in dBm [0..13]\n");
     printf(" -i         Send LoRa packet using inverted modulation polarity\n");
     printf(" -t         Delay between each packet sent in milliseconds [> 50ms]\n");
     printf( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" );
@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
     bool config_end_node = false;
 
     uint32_t ft = DEFAULT_FREQ_HZ;
-    int8_t rf_power = 14;
+    int8_t rf_power = 13;
     e_spreading_factor sf = DR_LORA_SF12;
     e_coding_rate cr = CR_LORA_LI_4_7;
     e_bandwidth bw_khz = BW_800KHZ;
@@ -327,8 +327,7 @@ int main(int argc, char **argv) {
             return EXIT_FAILURE;
         }
 
-        /* Configure mote: */
-        /* TODO: remove this ? */
+        /* Configure mote (for automatic testing bench) */
         if (config_end_node == true) {
             txpk.freq_hz = 2403000000;
             txpk.tx_mode = IMMEDIATE;
@@ -446,8 +445,19 @@ int main(int argc, char **argv) {
             wait_ms(delay_ms);
         }
 
+        /* Abort current TX if necessary */
+        if (lgw_status(TX_STATUS, &status) == 0) {
+            if (status != TX_FREE) {
+                printf("INFO: aborting TX (status:%u)\n", status);
+                if (lgw_abort_tx() != 0) {
+                    printf("ERROR: failed to abort TX\n");
+                }
+            }
+        }
+
         /* Stop the LoRa concentrator */
         if (lgw_stop() != 0) {
+            printf("ERROR: failed to stop the concentrator\n");
             return EXIT_FAILURE;
         }
     }

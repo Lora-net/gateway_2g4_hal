@@ -47,7 +47,7 @@ License: Revised BSD License, see LICENSE.TXT file include in the project
 
 /* Version string, used to identify the library version/options once compiled */
 const char lgw_version_string[] = "Version: " LIBLORAGW_VERSION ";";
-const char mcu_version_string[] = "00.02.13";
+const char mcu_version_string[] = "00.02.16";
 
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE VARIABLES ---------------------------------------------------- */
@@ -151,6 +151,7 @@ int lgw_channel_tx_setconf(const struct lgw_conf_channel_tx_s * conf) {
 
 int lgw_start(void) {
     int i;
+    uint8_t idx;
     s_ping_info gw_info;
     s_status status;
 
@@ -178,26 +179,42 @@ int lgw_start(void) {
     }
     printf("INFO: Concentrator MCU version is %s\n", gw_info.version);
 
-    /* Reset radios */
-    if (mcu_reset(mcu_fd, false) != 0) {
-        printf("WARNING: Failed to reset concentraor radios\n");
+    /* Reset RX radios */
+    if (mcu_reset(mcu_fd, RESET_TYPE__RX_ALL) != 0) {
+        printf("ERROR: Failed to reset concentrator RX radios\n");
+        return -1;
+    }
+
+    /* Reset TX radio */
+    if (mcu_reset(mcu_fd, RESET_TYPE__TX) != 0) {
+        printf("ERROR: Failed to reset concentrator TX radios\n");
         return -1;
     }
 
     /* Get status */
     if (mcu_get_status(mcu_fd, &status) != 0) {
-        printf("WARNING: Failed to get concentraor status\n");
+        printf("ERROR: Failed to get concentrator status\n");
         return -1;
     }
 
     /* Configure RX channels */
     for (i = 0; i < gw_info.nb_radio_rx; i++) {
-        if (rx_channel[i].enable == true) {
-            printf("INFO: Configuring RX channel %d => freq:%u sf:%d bw:%ukhz\n",   i,
-                                                                                    rx_channel[i].freq_hz,
-                                                                                    rx_channel[i].datarate,
-                                                                                    lgw_get_bw_khz(rx_channel[i].bandwidth));
-            if (mcu_config_rx(mcu_fd, i, &rx_channel[i]) != 0) {
+        /* Set index to configure radio #1 first (TODO: to be removed) */
+        idx = (i + 1) % 3;
+        /* Configure radio */
+        if (rx_channel[idx].enable == true) {
+            /* TODO: enforce radio #1 to be enabled. Temporary workaround until hardware is fixed */
+            if (rx_channel[1].enable == false) {
+                printf("ERROR: Channel 1 cannot be disabled (radio #1 needs to be configured)\n");
+                return -1;
+            }
+
+            printf("INFO: Configuring RX channel %d => freq:%u sf:%d bw:%ukhz\n",   idx,
+                                                                                    rx_channel[idx].freq_hz,
+                                                                                    rx_channel[idx].datarate,
+                                                                                    lgw_get_bw_khz(rx_channel[idx].bandwidth));
+            if (mcu_config_rx(mcu_fd, idx, &rx_channel[idx]) != 0) {
+                printf("ERROR: Failed to configure radio #%u\n", idx);
                 return -1;
             }
         }
@@ -213,9 +230,14 @@ int lgw_start(void) {
 int lgw_stop(void) {
     lgw_is_started = false;
 
-    /* Reset concentrator radios */
-    if (mcu_reset(mcu_fd, false) != 0) {
-        printf("WARNING: FAILED TO RESET CONCENTRATOR RADIOS\n");
+    /* Reset concentrator RX radios */
+    if (mcu_reset(mcu_fd, RESET_TYPE__RX_ALL) != 0) {
+        printf("WARNING: FAILED TO RESET CONCENTRATOR RX RADIOS\n");
+    }
+
+    /* Reset concentrator TX radio */
+    if (mcu_reset(mcu_fd, RESET_TYPE__TX) != 0) {
+        printf("WARNING: FAILED TO RESET CONCENTRATOR TX RADIO\n");
     }
 
     DEBUG_PRINTF("## closing %s\n", mcu_tty_path);
@@ -345,7 +367,12 @@ int lgw_status(e_status_type select, e_status * code) {
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 int lgw_abort_tx(void) {
-    /* TODO */
+    /* Reset concentrator TX radio */
+    if (mcu_reset(mcu_fd, RESET_TYPE__TX) != 0) {
+        printf("ERROR: Failed to reset concentrator TX radio\n");
+        return -1;
+    }
+
     return 0;
 }
 
@@ -405,6 +432,8 @@ const char* lgw_version_info(void) {
 
 int lgw_get_eui(uint64_t * eui) {
     s_ping_info gw_info;
+    uint32_t ID1, ID2, ID3;
+    uint8_t id[8];
 
     CHECK_NULL(eui);
 
@@ -412,8 +441,29 @@ int lgw_get_eui(uint64_t * eui) {
         return -1;
     }
 
-    /* Only considering 64 lowest significant bits (TODO) */
-    *eui = ((uint64_t)gw_info.unique_id_mid << 32) | (uint64_t)gw_info.unique_id_low;
+    ID1 = gw_info.unique_id_high;
+    ID2 = gw_info.unique_id_mid;
+    ID3 = gw_info.unique_id_low;
+
+    /* Build a 64-bits "EUI" from the 96-bits MCU device identifier number */
+    /* TODO: the EUI is not guaranteed to be unique */
+    id[7] = ( ID1 + ID3 ) >> 24;
+    id[6] = ( ID1 + ID3 ) >> 16;
+    id[5] = ( ID1 + ID3 ) >> 8;
+    id[4] = ( ID1 + ID3 ) >> 0;
+    id[3] = ( ID2 ) >> 24;
+    id[2] = ( ID2 ) >> 16;
+    id[1] = ( ID2 ) >> 8;
+    id[0] = ( ID2 ) >> 0;
+
+    *eui  = (uint64_t)(id[7]) << 56;
+    *eui |= (uint64_t)(id[6]) << 48;
+    *eui |= (uint64_t)(id[5]) << 40;
+    *eui |= (uint64_t)(id[4]) << 32;
+    *eui |= (uint64_t)(id[3]) << 24;
+    *eui |= (uint64_t)(id[2]) << 16;
+    *eui |= (uint64_t)(id[1]) << 8;
+    *eui |= (uint64_t)(id[0]) << 0;
 
     return 0;
 }

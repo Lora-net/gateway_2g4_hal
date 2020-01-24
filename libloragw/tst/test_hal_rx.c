@@ -65,7 +65,7 @@ void usage(void) {
     printf(" -h print this help\n");
     printf(" -d <path>  TTY device to be used to access the concentrator board\n");
     printf("                      => default path: " TTY_PATH_DEFAULT "\n");
-    printf(" -f <float> LoRa channel frequency in MHz\n");
+    printf(" -f <float> LoRa channel frequency in MHz, ]2400..2500[\n");
     printf(" -s <uint>  LoRa channel datarate 0:random, [5..12]\n");
     printf(" -b <uint>  LoRa channel bandwidth in khz 0:random, [200, 400, 800, 1600]\n");
     printf(" -t <uint>  Delay between 2 lgw_receive() requests, in milliseconds (default is %dms, min is %ums)\n", RX_DELAY_MS, RX_DELAY_MS);
@@ -250,8 +250,7 @@ int main(int argc, char **argv) {
             return EXIT_FAILURE;
         }
 
-        /* Configure mote: */
-        /* TODO: remove this ? */
+        /* Configure mote (for automatic testing bench) */
         if (config_end_node == true) {
             txpk.freq_hz = 2403000000;
             txpk.tx_mode = IMMEDIATE;

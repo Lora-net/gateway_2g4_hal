@@ -126,6 +126,17 @@ found in the `libtools` directory.
 
 ## 6. Changelog
 
+### v0.2.1 ###
+
+* Added LICENSE.TXT file in root directory
+* HAL: improved uniqueness of the EUI returned by lgw_get_eui().
+* HAL: implemented lgw_abort_tx() function.
+
+### v0.2.0 ###
+
+* HAL: Updated radio initialization sequence to match with ref. design v2
+* MCU: Updated fw to v00.02.16
+
 ### v0.1.0 ###
 
 * HAL: Initial version

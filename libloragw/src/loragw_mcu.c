@@ -188,7 +188,6 @@ int read_ack(int fd, uint8_t * buf, size_t buf_size) {
     n = read(fd, &buf[0], (size_t)HEADER_CMD_SIZE);
     if (errno == EINTR) {
         printf("INFO: syscall was interrupted, continue...\n");
-        /* TODO: check what to do here */
         return -1;
     } else if (n == -1) {
         perror("ERROR: Unable to read /dev/ttyACMx - ");
@@ -218,7 +217,6 @@ int read_ack(int fd, uint8_t * buf, size_t buf_size) {
             n = read(fd, &buf[nb_read], size - (nb_read - HEADER_CMD_SIZE));
             if (errno == EINTR) {
                 printf("INFO: syscall was interrupted, continue...\n");
-                /* TODO: check what to do here */
                 return -1;
             } else if (n == -1) {
                 perror("ERROR: Unable to read /dev/ttyACMx - ");
@@ -771,7 +769,7 @@ int mcu_prepare_tx(int fd, const struct lgw_pkt_tx_s * pkt_data, bool blocking) 
     if (pkt_data == NULL) {
         return -1;
     }
-    if (nb_radio_rx < 1) {
+    if (nb_radio_tx < 1) {
         printf("ERROR: cannot prepare tx, no radio available\n");
         return -1;
     }
@@ -1023,11 +1021,11 @@ int mcu_receive(int fd, uint8_t max_pkt, struct lgw_pkt_rx_s * pkt, uint8_t * nb
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-int mcu_reset(int fd, bool reset_mcu) {
+int mcu_reset(int fd, e_reset_type reset_type) {
     uint8_t status;
 
-    /* Reset All RX radios */
-    buf_req[REQ_RESET__TYPE] = RESET_TYPE__RX_ALL;
+    /* Reset selected element (RX, TX, MCU...) */
+    buf_req[REQ_RESET__TYPE] = reset_type;
     if (write_req(fd, ORDER_ID__REQ_RESET, REQ_RESET_SIZE, buf_req) != 0) {
         printf("ERROR: failed to write RESET request\n");
         return -1;
@@ -1046,52 +1044,6 @@ int mcu_reset(int fd, bool reset_mcu) {
     if (status != 0) {
         printf("ERROR: Failed to reset RX radios\n");
         return -1;
-    }
-
-    /* Reset TX radio */
-    buf_req[REQ_RESET__TYPE] = RESET_TYPE__TX;
-    if (write_req(fd, ORDER_ID__REQ_RESET, REQ_RESET_SIZE, buf_req) != 0) {
-        printf("ERROR: failed to write RESET request\n");
-        return -1;
-    }
-
-    if (read_ack(fd, buf_ack, sizeof buf_ack) < 0) {
-        printf("ERROR: failed to read RESET ack\n");
-        return -1;
-    }
-
-    if (decode_ack_reset(buf_ack, &status) != 0) {
-        printf("ERROR: invalid RESET ack\n");
-        return -1;
-    }
-
-    if (status != 0) {
-        printf("ERROR: Failed to reset TX radios\n");
-        return -1;
-    }
-
-    /* Reset MCU */
-    if (reset_mcu == true) {
-        buf_req[REQ_RESET__TYPE] = RESET_TYPE__GTW;
-        if (write_req(fd, ORDER_ID__REQ_RESET, REQ_RESET_SIZE, buf_req) != 0) {
-            printf("ERROR: failed to write RESET request\n");
-            return -1;
-        }
-
-        if (read_ack(fd, buf_ack, sizeof buf_ack) < 0) {
-            printf("ERROR: failed to read RESET ack\n");
-            return -1;
-        }
-
-        if (decode_ack_reset(buf_ack, &status) != 0) {
-            printf("ERROR: invalid RESET ack\n");
-            return -1;
-        }
-
-        if (status != 0) {
-            printf("ERROR: Failed to reset concentrator MCU\n");
-            return -1;
-        }
     }
 
     /* Wait for MCU to get ready after reset */
