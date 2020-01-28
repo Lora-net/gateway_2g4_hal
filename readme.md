@@ -126,6 +126,11 @@ found in the `libtools` directory.
 
 ## 6. Changelog
 
+### v0.2.2 ###
+
+* Packet Forwarder: allow SF5 and SF6 to comply with DR6 and DR7 of LoRaWAN
+Global 2.4GHz region.
+
 ### v0.2.1 ###
 
 * Added LICENSE.TXT file in root directory

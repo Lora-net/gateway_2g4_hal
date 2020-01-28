@@ -318,6 +318,12 @@ static int parse_radio_configuration(const char * conf_file) {
             snprintf(param_name, sizeof param_name, "chan_%i.spread_factor", i);
             sf = (uint32_t)json_object_dotget_number(conf_obj, param_name);
             switch (sf) {
+                case 5:
+                    rxconf.datarate = DR_LORA_SF5;
+                    break;
+                case 6:
+                    rxconf.datarate = DR_LORA_SF6;
+                    break;
                 case 7:
                     rxconf.datarate = DR_LORA_SF7;
                     break;
@@ -1250,6 +1256,14 @@ void thread_up(void) {
 
                 /* Lora datarate & bandwidth, 16-19 useful chars */
                 switch (p->datarate) {
+                    case DR_LORA_SF5:
+                        memcpy((void *)(buff_up + buff_index), (void *)",\"datr\":\"SF5", 12);
+                        buff_index += 12;
+                        break;
+                    case DR_LORA_SF6:
+                        memcpy((void *)(buff_up + buff_index), (void *)",\"datr\":\"SF6", 12);
+                        buff_index += 12;
+                        break;
                     case DR_LORA_SF7:
                         memcpy((void *)(buff_up + buff_index), (void *)",\"datr\":\"SF7", 12);
                         buff_index += 12;
@@ -1630,6 +1644,8 @@ void thread_down(void) {
                 continue;
             }
             switch (x0) {
+                case  5: txpkt.datarate = DR_LORA_SF5;  break;
+                case  6: txpkt.datarate = DR_LORA_SF6;  break;
                 case  7: txpkt.datarate = DR_LORA_SF7;  break;
                 case  8: txpkt.datarate = DR_LORA_SF8;  break;
                 case  9: txpkt.datarate = DR_LORA_SF9;  break;
