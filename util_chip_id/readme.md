@@ -22,26 +22,33 @@ It can then be used as a Gateway ID.
 `-h`
 will display a short help and version informations.
 
-## 3. Legal notice
+## 3. License
 
-The information presented in this project documentation does not form part of
-any quotation or contract, is believed to be accurate and reliable and may be
-changed without notice. No liability will be accepted by the publisher for any
-consequence of its use. Publication thereof does not convey nor imply any
-license under patent or other industrial or intellectual property rights.
-Semtech assumes no responsibility or liability whatsoever for any failure or
-unexpected operation resulting from misuse, neglect improper installation,
-repair or improper handling or unusual physical or electrical stress
-including, but not limited to, exposure to parameters beyond the specified
-maximum ratings or operation outside the specified range.
+--- Revised 3-Clause BSD License ---
+Copyright (C) 2020, SEMTECH (International) AG.
+All rights reserved.
 
-SEMTECH PRODUCTS ARE NOT DESIGNED, INTENDED, AUTHORIZED OR WARRANTED TO BE
-SUITABLE FOR USE IN LIFE-SUPPORT APPLICATIONS, DEVICES OR SYSTEMS OR OTHER
-CRITICAL APPLICATIONS. INCLUSION OF SEMTECH PRODUCTS IN SUCH APPLICATIONS IS
-UNDERSTOOD TO BE UNDERTAKEN SOLELY AT THE CUSTOMER'S OWN RISK. Should a
-customer purchase or use Semtech products for any such unauthorized
-application, the customer shall indemnify and hold Semtech and its officers,
-employees, subsidiaries, affiliates, and distributors harmless against all
-claims, costs damages and attorney fees which could arise.
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
+
+  * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+  * Neither the name of the Semtech nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL SEMTECH BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 *EOF*

@@ -1,17 +1,8 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    LoRa 2.4GHz concentrator Hardware Abstraction Layer
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * \brief     LoRa 2.4GHz concentrator Hardware Abstraction Layer
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */
@@ -47,7 +38,7 @@ License: Revised BSD License, see LICENSE.TXT file include in the project
 
 /* Version string, used to identify the library version/options once compiled */
 const char lgw_version_string[] = "Version: " LIBLORAGW_VERSION ";";
-const char mcu_version_string[] = "00.02.16";
+const char mcu_version_string[] = "01.00.01";
 
 /* -------------------------------------------------------------------------- */
 /* --- PRIVATE VARIABLES ---------------------------------------------------- */
@@ -113,14 +104,16 @@ int lgw_channel_rx_setconf(uint8_t channel, const struct lgw_conf_channel_rx_s *
     rx_channel[channel].datarate = conf->datarate;
     rx_channel[channel].bandwidth = conf->bandwidth;
     rx_channel[channel].rssi_offset = conf->rssi_offset;
+    rx_channel[channel].sync_word = conf->sync_word;
 
     if (conf->enable == true) {
-        DEBUG_PRINTF("INFO: Setting channel %u configuration => en:%d freq:%u sf:%d bw:%ukhz rssi_offset:%.1f\n",   channel,
+        DEBUG_PRINTF("INFO: Setting channel %u configuration => en:%d freq:%u sf:%d bw:%ukhz rssi_offset:%.1f sync_word:0x%02X\n",   channel,
                                                                                                     rx_channel[channel].enable,
                                                                                                     rx_channel[channel].freq_hz,
                                                                                                     rx_channel[channel].datarate,
                                                                                                     lgw_get_bw_khz(rx_channel[channel].bandwidth),
-                                                                                                    rx_channel[channel].rssi_offset);
+                                                                                                    rx_channel[channel].rssi_offset,
+                                                                                                    rx_channel[channel].sync_word);
     } else {
         DEBUG_PRINTF("INFO: Channel %u is disabled\n", channel);
     }
@@ -470,7 +463,7 @@ int lgw_get_eui(uint64_t * eui) {
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */
 
-int lgw_get_temperature(float* temperature) {
+int lgw_get_temperature(float * temperature, e_temperature_src * source) {
     s_status status;
 
     CHECK_NULL(temperature);
@@ -486,7 +479,10 @@ int lgw_get_temperature(float* temperature) {
         return -1;
     }
 
-    *temperature = status.temperature;
+    *temperature = status.temperature.value;
+    if (source != NULL) {
+        *source = status.temperature.source;
+    }
 
     return 0;
 }

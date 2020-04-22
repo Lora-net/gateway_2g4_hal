@@ -1,17 +1,8 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    Configure Lora concentrator and forward packets to a server
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * \brief     Configure LoRa 2.4Ghz concentrator and forward packets to a server
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */
@@ -172,6 +163,9 @@ static struct jit_queue_s jit_queue[LGW_TX_CHANNEL_NB_MAX];
 /* Gateway specificities */
 static int8_t antenna_gain = 0;
 
+/* LoRa network configuration */
+static uint8_t lora_sync_word = LORA_SYNC_WORD_PUBLIC;
+
 /* TX capabilities */
 static uint32_t tx_freq_min[LGW_TX_CHANNEL_NB_MAX]; /* lowest frequency supported by TX chain */
 static uint32_t tx_freq_max[LGW_TX_CHANNEL_NB_MAX]; /* highest frequency supported by TX chain */
@@ -282,6 +276,20 @@ static int parse_radio_configuration(const char * conf_file) {
     }
     MSG("INFO: antenna_gain %d dBi\n", antenna_gain);
 
+    /* set LoRa sync word (public or private) */
+    val = json_object_get_value(conf_obj, "lorawan_public"); /* fetch value (if possible) */
+    if (json_value_get_type(val) == JSONBoolean) {
+        if ((bool)json_value_get_boolean(val) == true) {
+            lora_sync_word = LORA_SYNC_WORD_PUBLIC;
+        } else {
+            lora_sync_word = LORA_SYNC_WORD_PRIVATE;
+        }
+    } else {
+        MSG("WARNING: Data type for lorawan_public seems wrong, please check\n");
+        lora_sync_word = LORA_SYNC_WORD_PUBLIC;
+    }
+    MSG("INFO: LoRa sync_word 0x%02X (%s)\n", lora_sync_word, (lora_sync_word == LORA_SYNC_WORD_PUBLIC) ? "public" : "private");
+
     /* set configuration for RX channels */
     for (i = 0; i < LGW_RX_CHANNEL_NB_MAX; ++i) {
         memset(&rxconf, 0, sizeof rxconf); /* initialize configuration structure */
@@ -354,6 +362,7 @@ static int parse_radio_configuration(const char * conf_file) {
                 MSG("WARNING: no RSSI offset configured for channel %i\n", i);
                 rxconf.rssi_offset = 0.0;
             }
+            rxconf.sync_word = lora_sync_word;
             MSG("INFO: channel %i enabled: frequency %u, bandwidth %uHz, SF%u, RSSI offset %.1f\n", i, rxconf.freq_hz, bw, sf, rxconf.rssi_offset);
         }
         /* all parameters parsed, submitting configuration to the HAL */
@@ -706,6 +715,7 @@ int main(int argc, char ** argv)
     uint32_t inst_tstamp;
     uint64_t eui;
     float temperature;
+    e_temperature_src temp_src;
 
     /* statistics variable */
     time_t t;
@@ -1013,12 +1023,12 @@ int main(int argc, char ** argv)
         jit_print_queue (&jit_queue[0], false, DEBUG_LOG);
 
         pthread_mutex_lock(&mx_concent);
-        i = lgw_get_temperature(&temperature);
+        i = lgw_get_temperature(&temperature, &temp_src);
         pthread_mutex_unlock(&mx_concent);
         if (i != LGW_HAL_SUCCESS) {
             printf("### Concentrator temperature unknown ###\n");
         } else {
-            printf("### Concentrator temperature: %.0f C ###\n", temperature);
+            printf("### Concentrator temperature: %.0f C (source:%s) ###\n", temperature, (temp_src == TEMP_SRC_EXT) ? "sensor" : "mcu");
         }
         printf("##### END #####\n");
 
@@ -1699,6 +1709,9 @@ void thread_down(void) {
             } else {
                 txpkt.preamble = (uint16_t)STD_LORA_PREAMBLE;
             }
+
+            /* set the LoRa sync word */
+            txpkt.sync_word = lora_sync_word;
 
             /* Parse payload length (mandatory) */
             val = json_object_get_value(txpk_obj,"size");

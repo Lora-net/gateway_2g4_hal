@@ -3,7 +3,7 @@
 	 \____ \| ___ |    (_   _) ___ |/ ___)  _ \
 	 _____) ) ____| | | || |_| ____( (___| | | |
 	(______/|_____)_|_|_| \__)_____)\____)_| |_|
-	  (C)2019 Semtech
+	  (C)2020 Semtech
 
 LoRa 2.4Ghz Gateway project
 ===========================
@@ -124,7 +124,30 @@ found in the `libtools` directory.
 * parson: a JSON parser (http://kgabis.github.com/parson/)
 * tinymt32: a pseudo-random generator (only used for debug/test)
 
-## 6. Changelog
+## 6. Helper scripts
+
+### 6.1. tools/rpi_configure_gpio.sh
+
+This script is to be used when using the gateway board on a Raspberry Pi through
+the adaptation board, in order to properly drive the MCU_RESET and MCU_BOOT0 pins.
+
+## 7. Changelog
+
+### v1.0.0 ###
+
+* HAL: Updated RX radio configuration to use propre preamble length for SF5 and
+SF6 spreading factors.
+* Updated License description and file headers.
+
+### v0.3.0 ###
+
+* HAL: lgw_get_temperature() either the temperature measured by an external
+sensor if available, or use the concentrator's MCU internal sensor. The function
+indicates the source from which comes the given temperature.
+* HAL: Allows to choose the LoRa sync word to be used. 0x21 for public LoRaWAN
+networks, 0x12 for private networks.
+* Packet Forwarder: Added a lorawan_public field in the JSON configuration file
+to set the sync word to be used (public or private).
 
 ### v0.2.2 ###
 
@@ -146,26 +169,8 @@ Global 2.4GHz region.
 
 * HAL: Initial version
 
-## 7. Legal notice
+## 8. License
 
-The information presented in this project documentation does not form part of
-any quotation or contract, is believed to be accurate and reliable and may be
-changed without notice. No liability will be accepted by the publisher for any
-consequence of its use. Publication thereof does not convey nor imply any
-license under patent or other industrial or intellectual property rights.
-Semtech assumes no responsibility or liability whatsoever for any failure or
-unexpected operation resulting from misuse, neglect improper installation,
-repair or improper handling or unusual physical or electrical stress
-including, but not limited to, exposure to parameters beyond the specified
-maximum ratings or operation outside the specified range.
-
-SEMTECH PRODUCTS ARE NOT DESIGNED, INTENDED, AUTHORIZED OR WARRANTED TO BE
-SUITABLE FOR USE IN LIFE-SUPPORT APPLICATIONS, DEVICES OR SYSTEMS OR OTHER
-CRITICAL APPLICATIONS. INCLUSION OF SEMTECH PRODUCTS IN SUCH APPLICATIONS IS
-UNDERSTOOD TO BE UNDERTAKEN SOLELY AT THE CUSTOMER'S OWN RISK. Should a
-customer purchase or use Semtech products for any such unauthorized
-application, the customer shall indemnify and hold Semtech and its officers,
-employees, subsidiaries, affiliates, and distributors harmless against all
-claims, costs damages and attorney fees which could arise.
+See the LICENSE.TXT file provided in the root directory of this project.
 
 *EOF*

@@ -1,17 +1,8 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    LoRa 2.4GHz concentrator Hardware Abstraction Layer
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * \brief     LoRa 2.4GHz concentrator Hardware Abstraction Layer
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 #ifndef _LORAGW_HAL_H
 #define _LORAGW_HAL_H
@@ -39,8 +30,12 @@ License: Revised BSD License, see LICENSE.TXT file include in the project
 #define LGW_TX_CHANNEL_NB_MAX 1    /* Maximum number of RX channels supported */
 
 /* modulation parameters */
+#define HDR_LORA_PREAMBLE   12
 #define STD_LORA_PREAMBLE   8
 #define MIN_LORA_PREAMBLE   8
+
+#define LORA_SYNC_WORD_PUBLIC   0x21
+#define LORA_SYNC_WORD_PRIVATE  0x12
 
 #define TX_POWER_MIN        -18 /* dBm */
 #define TX_POWER_MAX        13  /* dBm */
@@ -113,12 +108,17 @@ typedef enum {
     STAT_CRC_OK     = 0x10
 } e_crc_status;
 
+typedef enum {
+    TEMP_SRC_EXT,   /* the temperature has been measured with an external sensor */
+    TEMP_SRC_MCU    /* the temperature has been measured by the gateway MCU */
+} e_temperature_src;
+
 /**
 @struct lgw_conf_board_s
 @brief Configuration structure for board specificities
 */
 struct lgw_conf_board_s {
-    char tty_path[64];/*!> Path to access the TTY device to connect to concentrator board */
+    char tty_path[64];      /*!> Path to access the TTY device to connect to concentrator board */
 };
 
 /**
@@ -131,6 +131,7 @@ struct lgw_conf_channel_rx_s {
     e_bandwidth         bandwidth;      /*!> RX bandwidth */
     e_spreading_factor  datarate;       /*!> RX datarate */
     float               rssi_offset;    /*!> RSSI offset to be applied on this channel */
+    uint8_t             sync_word;      /*!> Public/LoRaWAN network:0x21, Private network:0x12 */
 };
 
 /**
@@ -155,6 +156,7 @@ struct lgw_pkt_tx_s {
     e_coding_rate       coderate;       /*!> error-correcting code of the packet (LoRa only) */
     bool                invert_pol;     /*!> invert signal polarity, for orthogonal downlinks (LoRa only) */
     uint16_t            preamble;       /*!> set the preamble length, 0 for default */
+    uint8_t             sync_word;      /*!> Public:0x21, Private:0x12 */
     bool                no_crc;         /*!> if true, do not send a CRC in the packet */
     bool                no_header;      /*!> if true, enable implicit header mode (LoRa) */
     uint16_t            size;           /*!> payload size in bytes */
@@ -296,9 +298,10 @@ int lgw_get_eui(uint64_t * eui);
 /**
 @brief Return the temperature measured by the LoRa concentrator sensor (updated every 30s)
 @param temperature The temperature measured, in degree celcius
+@param source Has the temperature been measured by an external sensor or by the MCU
 @return LGW_HAL_ERROR id the operation failed, LGW_HAL_SUCCESS else
 */
-int lgw_get_temperature(float * temperature);
+int lgw_get_temperature(float * temperature, e_temperature_src * source);
 
 /**
 @brief Return time on air of given packet, in milliseconds

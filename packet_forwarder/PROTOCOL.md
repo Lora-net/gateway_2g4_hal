@@ -4,10 +4,10 @@
 	 \____ \| ___ |    (_   _) ___ |/ ___)  _ \
 	 _____) ) ____| | | || |_| ____( (___| | | |
 	(______/|_____)_|_|_| \__)_____)\____)_| |_|
-	  (C)2019 Semtech
+	  (C)2020 Semtech
 
-Basic communication protocol between LoRa gateway and Network Server
-====================================================================
+Basic communication protocol between LoRa 2.4Ghz gateway and Network Server
+===========================================================================
 
 
 ## 1. Introduction
@@ -29,30 +29,21 @@ losses (no retries).
 	| +--+-----------+     +------+ |       xx x  x     xxx        |        |
 	| |              |     |      | |      xx  Internet  xx        |        |
 	| | Concentrator |<--->| Host |<-------xx     or    xx-------->|        |
-	| |              | SPI |      | |      xx  Intranet  xx        | Server |
+	| |              | USB |      | |      xx  Intranet  xx        | Server |
 	| +--------------+     +------+ |       xxxx   x   xxxx        |        |
-	|    ^                     ^    |           xxxxxxxx           |        |
-	|    | PPS +-------+ NMEA  |    |                              |        |
-	|    +-----|  GPS  |-------+    |                              +--------+
-	|          | (opt) |            |
-	|          +-------+            |
-	|                               |
-	|             Gateway           |
-	+- - - - - - - - - - - - - - - -+
+	|                               |           xxxxxxxx           |        |
+	|             Gateway           |                              |        |
+	+- - - - - - - - - - - - - - - -+                              +--------+
 
 __Concentrator__: radio RX/TX board, based on Semtech stand-alone modems
-(SX1280), with an interface MCU..
+(SX1280), with an interface MCU.
 
 __Host__: embedded computer on which the packet forwarder is run. Drives the
-concentrator through a SPI link.
-
-__GPS__: GNSS (GPS, Galileo, GLONASS, etc) receiver with a "1 Pulse Per Second"
-output and a serial link to the host to send NMEA frames containing time and
-geographical coordinates data. Optional.
+concentrator through a USB link.
 
 __Gateway__: a device composed of at least one radio concentrator, a host, some
 network connection to the internet or a private network (Ethernet, 3G, Wifi,
-microwave link), and optionally a GPS receiver for synchronization.
+microwave link).
 
 __Server__: an abstract computer that will process the RF packets received and
 forwarded by the gateway, and issue RF packets in response that the gateway
@@ -195,9 +186,6 @@ That object contains the status of the gateway, with the following fields:
  Name |  Type  | Function
 :----:|:------:|--------------------------------------------------------------
  time | string | UTC 'system' time of the gateway, ISO 8601 'expanded' format
- lati | number | GPS latitude of the gateway in degree (float, N is +)
- long | number | GPS latitude of the gateway in degree (float, E is +)
- alti | number | GPS altitude of the gateway in meter RX (integer)
  rxnb | number | Number of radio packets received (unsigned integer)
  rxok | number | Number of radio packets received with a valid PHY CRC
  rxfw | number | Number of radio packets forwarded (unsigned integer)
@@ -211,9 +199,6 @@ Example (white-spaces, indentation and newlines added for readability):
 ``` json
 {"stat":{
     "time":"2014-01-12 08:59:28 GMT",
-    "lati":46.24000,
-    "long":3.25230,
-    "alti":145,
     "rxnb":2,
     "rxok":2,
     "rxfw":2,

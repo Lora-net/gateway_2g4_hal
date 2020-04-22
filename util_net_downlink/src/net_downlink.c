@@ -1,17 +1,8 @@
-/*
-  ______                              _
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
- (C)2019 Semtech
-
- Description:
-    Network packet sender, sends UDP packets to a running packet forwarder
-    Network packet receiver, receives UDP packets from a running packet forwarder.
-
- License: Revised BSD License, see LICENSE.TXT file include in the project
+/*!
+ * \brief     Network packet sender, sends UDP packets to a running packet forwarder
+ * \brief     Network packet receiver, receives UDP packets from a running packet forwarder.
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
  */
 
 /* -------------------------------------------------------------------------- */

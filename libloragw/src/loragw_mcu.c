@@ -1,16 +1,8 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    LoRa 2.4GHz concentrator MCU interface functions
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
+/*!
+ * \brief     LoRa 2.4GHz concentrator MCU interface functions
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */
@@ -241,7 +233,8 @@ int read_ack(int fd, uint8_t * buf, size_t buf_size) {
 
 int decode_ack_get_status(const uint8_t * payload, s_status * status) {
     int i;
-    int16_t temperature;
+    int16_t temperature_sensor;
+    int8_t temperature_mcu;
 
     /* sanity checks */
     if ((payload == NULL) || (status == NULL)) {
@@ -263,9 +256,16 @@ int decode_ack_get_status(const uint8_t * payload, s_status * status) {
 
     status->pps_time_us = bytes_be_to_uint32_le(&payload[HEADER_CMD_SIZE + ACK_GET_STATUS__PPS_TIME_31_24]);
 
-    temperature = (int16_t)(payload[HEADER_CMD_SIZE + ACK_GET_STATUS__TEMPERATURE_15_8] << 8) |
-                  (int16_t)(payload[HEADER_CMD_SIZE + ACK_GET_STATUS__TEMPERATURE_7_0]  << 0);
-    status->temperature = (float)temperature / 100.0;
+    if (payload[HEADER_CMD_SIZE + ACK_GET_STATUS__TEMPERATURE_STATUS] == 1) {
+        temperature_sensor = (int16_t)(payload[HEADER_CMD_SIZE + ACK_GET_STATUS__TEMPERATURE_15_8] << 8) |
+                             (int16_t)(payload[HEADER_CMD_SIZE + ACK_GET_STATUS__TEMPERATURE_7_0]  << 0);
+        status->temperature.value = (float)temperature_sensor / 100.0;
+        status->temperature.source = TEMP_SRC_EXT;
+    } else {
+        temperature_mcu = (int8_t)payload[HEADER_CMD_SIZE + ACK_GET_STATUS__MCU_TEMPERATURE];
+        status->temperature.value = (float)temperature_mcu;
+        status->temperature.source = TEMP_SRC_MCU;
+    }
 
     for (i = 0; i < nb_radio_rx; i++) {
         status->rx_crc_ok[i]   = (uint16_t)(payload[HEADER_CMD_SIZE + ACK_GET_STATUS__RX_STATUS + (4 * i) + 0] << 8);
@@ -842,6 +842,9 @@ int mcu_prepare_tx(int fd, const struct lgw_pkt_tx_s * pkt_data, bool blocking) 
     buf_req[REQ_PREPARE_TX__PREAMBLE_15_8]  = (uint8_t)(pkt_data->preamble >> 8);
     buf_req[REQ_PREPARE_TX__PREAMBLE_7_0]   = (uint8_t)(pkt_data->preamble >> 0);
 
+    /* Sync word (public or private) */
+    buf_req[REQ_PREPARE_TX__SYNC_WORD] = pkt_data->sync_word;
+
     /* Payload length */
     buf_req[REQ_PREPARE_TX__PAYLOAD_LEN] = pkt_data->size;
 
@@ -905,6 +908,7 @@ int mcu_prepare_tx(int fd, const struct lgw_pkt_tx_s * pkt_data, bool blocking) 
 
 int mcu_config_rx(int fd, uint8_t channel, const struct lgw_conf_channel_rx_s * conf) {
     e_config_rx_status config_rx_status;
+    uint16_t preamble_length;
 
     /* Check params */
     if (conf == NULL) {
@@ -914,6 +918,11 @@ int mcu_config_rx(int fd, uint8_t channel, const struct lgw_conf_channel_rx_s * 
         printf("ERROR: cannot configure channel %u, not enough radios available (%u)\n", channel, nb_radio_rx);
         return -1;
     }
+    if ((conf->sync_word != LORA_SYNC_WORD_PRIVATE) && (conf->sync_word != LORA_SYNC_WORD_PUBLIC)) {
+        printf("ERROR: invlid sync_word for channel %u\n", channel);
+        return -1;
+    }
+    // TODO: check all params
 
     buf_req[REQ_CONF_RX__RADIO_IDX] = channel;
 
@@ -922,14 +931,17 @@ int mcu_config_rx(int fd, uint8_t channel, const struct lgw_conf_channel_rx_s * 
     buf_req[REQ_CONF_RX__FREQ_15_8]  = (uint8_t)(conf->freq_hz >> 8);
     buf_req[REQ_CONF_RX__FREQ_7_0]   = (uint8_t)(conf->freq_hz >> 0);
 
-    buf_req[REQ_CONF_RX__PREAMBLE_LEN_15_8] = (uint8_t)(STD_LORA_PREAMBLE >> 8);
-    buf_req[REQ_CONF_RX__PREAMBLE_LEN_7_0]  = (uint8_t)(STD_LORA_PREAMBLE >> 0);
+    preamble_length = ((conf->datarate == DR_LORA_SF5) || (conf->datarate == DR_LORA_SF6)) ? HDR_LORA_PREAMBLE : STD_LORA_PREAMBLE;
+    buf_req[REQ_CONF_RX__PREAMBLE_LEN_15_8] = (uint8_t)(preamble_length >> 8);
+    buf_req[REQ_CONF_RX__PREAMBLE_LEN_7_0]  = (uint8_t)(preamble_length >> 0);
 
     buf_req[REQ_CONF_RX__SF] = (uint8_t)(conf->datarate);
 
     buf_req[REQ_CONF_RX__BW] = (uint8_t)(conf->bandwidth);
 
     buf_req[REQ_CONF_RX__USE_IQ_INVERTED] = 0;
+
+    buf_req[REQ_CONF_RX__SYNC_WORD] = conf->sync_word;
 
     /* Send CONFIG_RX request */
     if (write_req(fd, ORDER_ID__REQ_CONFIG_RX, REQ_CONF_RX_SIZE, buf_req) != 0) {

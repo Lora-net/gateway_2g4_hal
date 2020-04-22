@@ -1,17 +1,6 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    Minimum test program for the loragw_hal 'library'
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */
@@ -78,6 +67,7 @@ void usage(void) {
     printf(" --trig       Use TIMESTAMP mode instead of IMMEDIATE\n");
     printf(" --per        Use PER measurement payload (32-bits counter on last 4 bytes)\n");
     printf(" --config     Send a packet to the end-node to configure it with TX_APP with given SF and BW\n");
+    printf(" --priv       Use LoRa sync word for private network (0x12)\n");
 }
 
 /* handle signals */
@@ -100,6 +90,7 @@ int main(int argc, char **argv) {
     unsigned int arg_u;
     int arg_i;
     bool config_end_node = false;
+    bool lorawan_public = true;
 
     uint32_t ft = DEFAULT_FREQ_HZ;
     int8_t rf_power = 13;
@@ -137,6 +128,7 @@ int main(int argc, char **argv) {
         {"szmin", required_argument, 0, 0},
         {"szmax", required_argument, 0, 0},
         {"config", 0, 0, 0},
+        {"priv", 0, 0, 0},
         {0, 0, 0, 0}
     };
 
@@ -278,6 +270,8 @@ int main(int argc, char **argv) {
                     }
                 } else if (strcmp(long_options[option_index].name, "config") == 0) {
                     config_end_node = true;
+                } else if (strcmp(long_options[option_index].name, "priv") == 0) {
+                    lorawan_public = false;
                 } else {
                     printf("ERROR: argument parsing options. Use -h to print help\n");
                     return EXIT_FAILURE;
@@ -312,9 +306,6 @@ int main(int argc, char **argv) {
     /* Disable all RX channels */
     for (i = 0; i < LGW_RX_CHANNEL_NB_MAX; i++) {
         channelconf.enable = false;
-        channelconf.freq_hz = 2403000000;
-        channelconf.bandwidth = BW_800KHZ;
-        channelconf.datarate = DR_LORA_SF12;
         if (lgw_channel_rx_setconf(i, &channelconf) != 0) {
             printf("ERROR: failed to configure channel %u\n", i);
             return EXIT_FAILURE;
@@ -338,6 +329,7 @@ int main(int argc, char **argv) {
             txpk.no_crc = true;
             txpk.no_header = false;
             txpk.preamble = 8;
+            txpk.sync_word = (lorawan_public == true) ? LORA_SYNC_WORD_PUBLIC : LORA_SYNC_WORD_PRIVATE;
             txpk.rf_power = 0;
             txpk.size = 3;
 
@@ -409,6 +401,7 @@ int main(int argc, char **argv) {
             pkt.no_crc = true;
             pkt.no_header = false;
             pkt.preamble = preamble;
+            pkt.sync_word = (lorawan_public == true) ? LORA_SYNC_WORD_PUBLIC : LORA_SYNC_WORD_PRIVATE;
 
             /* Set given size or set current size of "all sizes" mode */
             if (size != 0) {

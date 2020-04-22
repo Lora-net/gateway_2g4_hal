@@ -1,17 +1,6 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    Minimum test program for the loragw_hal 'library'
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */

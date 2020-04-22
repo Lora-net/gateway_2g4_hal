@@ -1,16 +1,8 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    LoRa 2.4GHz concentrator MCU interface functions
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
+/*!
+ * \brief     LoRa 2.4GHz concentrator MCU interface functions
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 #ifndef _LORAGW_MCU_H
 #define _LORAGW_MCU_H
@@ -97,6 +89,7 @@ typedef enum
     REQ_PREPARE_TX__USE_CRC,
     REQ_PREPARE_TX__RAMP_UP,
     REQ_PREPARE_TX__PREAMBLE_15_8,      REQ_PREPARE_TX__PREAMBLE_7_0,
+    REQ_PREPARE_TX__SYNC_WORD,
     REQ_PREPARE_TX__PAYLOAD_LEN,
     REQ_PREPARE_TX__PAYLOAD /* keep this as the last enum */
     // size isn't fix
@@ -107,7 +100,9 @@ typedef enum {
     ACK_GET_STATUS__PRECISE_TIMER_31_24,    ACK_GET_STATUS__PRECISE_TIMER_23_16,    ACK_GET_STATUS__PRECISE_TIMER_15_8, ACK_GET_STATUS__PRECISE_TIMER_7_0,
     ACK_GET_STATUS__PPS_STATUS,
     ACK_GET_STATUS__PPS_TIME_31_24,         ACK_GET_STATUS__PPS_TIME_23_16,         ACK_GET_STATUS__PPS_TIME_15_8,      ACK_GET_STATUS__PPS_TIME_7_0,
+    ACK_GET_STATUS__TEMPERATURE_STATUS,
     ACK_GET_STATUS__TEMPERATURE_15_8,       ACK_GET_STATUS__TEMPERATURE_7_0,
+    ACK_GET_STATUS__MCU_TEMPERATURE,
     ACK_GET_STATUS__RX_STATUS /* 4 bytes per radio : NB_PKT_CRC_OK | NB_PKT_CRC_ERR */
     //Size is fix but determine by NB_RADIO_RX
 } e_cmd_offset_ack_get_status;
@@ -165,6 +160,7 @@ typedef enum {
     REQ_CONF_RX__SF,
     REQ_CONF_RX__BW,
     REQ_CONF_RX__USE_IQ_INVERTED,
+    REQ_CONF_RX__SYNC_WORD,
     REQ_CONF_RX_SIZE
 } e_cmd_offset_req_config_rx;
 
@@ -256,11 +252,16 @@ typedef struct {
 } s_ping_info;
 
 typedef struct {
+    float value;
+    e_temperature_src source;
+} s_temperature;
+
+typedef struct {
     uint32_t system_time_ms;
     uint32_t precise_time_us;
     e_pps_status pps_status;
     uint32_t pps_time_us;
-    float temperature;
+    s_temperature temperature;
     uint16_t rx_crc_ok[NB_RADIO_RX_MAX];
     uint16_t rx_crc_err[NB_RADIO_RX_MAX];
 } s_status;

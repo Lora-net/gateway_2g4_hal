@@ -1,17 +1,8 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    LoRa concentrator : Packet Forwarder trace helpers
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * \brief     LoRa 2.4Ghz concentrator : Packet Forwarder trace helpers
+ *
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 #ifndef _LORA_PKTFWD_TRACE_H
 #define _LORA_PKTFWD_TRACE_H

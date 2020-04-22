@@ -3,7 +3,7 @@
 	 \____ \| ___ |    (_   _) ___ |/ ___)  _ \
 	 _____) ) ____| | | || |_| ____( (___| | | |
 	(______/|_____)_|_|_| \__)_____)\____)_| |_|
-	  (C)2019 Semtech
+	  (C)2020 Semtech
 
 LoRa 2.4Ghz packet forwarder
 ============================
@@ -21,37 +21,32 @@ please read the PROTOCOL.TXT document.
 
 ## 2. System schematic and definitions
 
-	((( Y )))
-	    |
-	    |
-	+- -|- - - - - - - - - - - - -+        xxxxxxxxxxxx          +--------+
-	|+--+-----------+     +------+|       xx x  x     xxx        |        |
-	||              |     |      ||      xx  Internet  xx        |        |
-	|| Concentrator |<----+ Host |<------xx     or    xx-------->|        |
-	||              | SPI |      ||      xx  Intranet  xx        | Server |
-	|+--------------+     +------+|       xxxx   x   xxxx        |        |
-	|   ^                    ^    |           xxxxxxxx           |        |
-	|   | PPS  +-----+  NMEA |    |                              |        |
-	|   +------| GPS |-------+    |                              +--------+
-	|          +-----+            |
-	|                             |
-	|            Gateway          |
-	+- - - - - - - - - - - - - - -+
+	 ((( Y )))
+	     |
+	     |
+	+ - -|- - - - - - - - - - - - - +        xxxxxxxxxxxx          +--------+
+	| +--+-----------+     +------+ |       xx x  x     xxx        |        |
+	| |              |     |      | |      xx  Internet  xx        |        |
+	| | Concentrator |<--->| Host |<-------xx     or    xx-------->|        |
+	| |              | USB |      | |      xx  Intranet  xx        | Server |
+	| +--------------+     +------+ |       xxxx   x   xxxx        |        |
+	|                               |           xxxxxxxx           |        |
+	|             Gateway           |                              |        |
+	+- - - - - - - - - - - - - - - -+                              +--------+
 
-Concentrator: radio RX/TX board, based on Semtech multichannel modems (SX130x),
-transceivers (SX135x) and/or low-power stand-alone modems (SX127x).
+__Concentrator__: radio RX/TX board, based on Semtech stand-alone modems
+(SX1280), with an interface MCU.
 
-Host: embedded computer on which the packet forwarder is run. Drives the
-concentrator through a SPI link.
+__Host__: embedded computer on which the packet forwarder is run. Drives the
+concentrator through a USB link.
 
-Gateway: a device composed of at least one radio concentrator, a host, some
+__Gateway__: a device composed of at least one radio concentrator, a host, some
 network connection to the internet or a private network (Ethernet, 3G, Wifi,
-microwave link), and optionally a GPS receiver for synchronization.
+microwave link).
 
-Server: an abstract computer that will process the RF packets received and
+__Server__: an abstract computer that will process the RF packets received and
 forwarded by the gateway, and issue RF packets in response that the gateway
 will have to emit.
-
 
 ## 3. Dependencies
 
@@ -94,7 +89,7 @@ channels) and preferably default "safe" values for parameters that are
 specific for each gateway (eg. specify a default MAC address).
 
 In each configuration file, the program looks for a JSON object named
-"SX130x_conf" that should contain the parameters for the Lora concentrator
+"radio_conf" that should contain the parameters for the Lora concentrator
 board (RF channels definition, modem parameters, etc) and another JSON object
 called "gateway_conf" that should contain the gateway parameters (gateway MAC
 address, IP address of the server, keep-alive time, etc).
@@ -178,31 +173,32 @@ different system constraints.
 
 ## 6. License
 
-Copyright (C) 2019, SEMTECH S.A.
+--- Revised 3-Clause BSD License ---
+Copyright (C) 2020, SEMTECH (International) AG.
 All rights reserved.
 
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are met:
+Redistribution and use in source and binary forms, with or without modification,
+are permitted provided that the following conditions are met:
 
-* Redistributions of source code must retain the above copyright
-  notice, this list of conditions and the following disclaimer.
-* Redistributions in binary form must reproduce the above copyright
-  notice, this list of conditions and the following disclaimer in the
-  documentation and/or other materials provided with the distribution.
-* Neither the name of the Semtech corporation nor the
-  names of its contributors may be used to endorse or promote products
-  derived from this software without specific prior written permission.
+  * Redistributions of source code must retain the above copyright notice,
+    this list of conditions and the following disclaimer.
+  * Redistributions in binary form must reproduce the above copyright notice,
+    this list of conditions and the following disclaimer in the documentation
+    and/or other materials provided with the distribution.
+  * Neither the name of the Semtech nor the names of its contributors
+    may be used to endorse or promote products derived from this software
+    without specific prior written permission.
 
 THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
 ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
 WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
-DISCLAIMED. IN NO EVENT SHALL SEMTECH S.A. BE LIABLE FOR ANY
-DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
-(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
-LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
-ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
-SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+DISCLAIMED. IN NO EVENT SHALL SEMTECH BE LIABLE FOR ANY DIRECT, INDIRECT,
+INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
+PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE
+OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ## 7. License for Parson library
 

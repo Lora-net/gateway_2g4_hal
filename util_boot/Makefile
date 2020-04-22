@@ -31,7 +31,7 @@ endif
 
 ### Application-specific variables
 APP_NAME := boot
-APP_LIBS := -lloragw -lm
+APP_LIBS := -lloragw -lm -lrt
 
 ### Environment constants
 LIB_PATH := ../libloragw

@@ -1,17 +1,6 @@
-/*
- / _____)             _              | |
-( (____  _____ ____ _| |_ _____  ____| |__
- \____ \| ___ |    (_   _) ___ |/ ___)  _ \
- _____) ) ____| | | || |_| ____( (___| | | |
-(______/|_____)_|_|_| \__)_____)\____)_| |_|
-  (C)2019 Semtech
-
-Description:
-    Minimum test program for the loragw_hal 'library'
-
-License: Revised BSD License, see LICENSE.TXT file include in the project
-*/
-
+/*!
+ * License: Revised BSD 3-Clause License, see LICENSE.TXT file include in the project
+ */
 
 /* -------------------------------------------------------------------------- */
 /* --- DEPENDANCIES --------------------------------------------------------- */
@@ -72,6 +61,7 @@ void usage(void) {
     printf( "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~\n" );
     printf(" --loop     Number of loops for HAL start/stop (HAL unitary test)\n");
     printf(" --config   Send a packet to the end-node to configure it with TX_APP with given SF and BW\n");
+    printf(" --priv       Use LoRa sync word for private network (0x12)\n");
 }
 
 /* handle signals */
@@ -95,6 +85,7 @@ int main(int argc, char **argv) {
     struct timeval now;
     int32_t tmst_diff;
     bool config_end_node = false;
+    bool lorawan_public = true;
 
     uint32_t ft = 2425000000;
     e_spreading_factor sf = DR_LORA_SF12;
@@ -119,6 +110,7 @@ int main(int argc, char **argv) {
     static struct option long_options[] = {
         {"loop", required_argument, 0, 0},
         {"config", 0, 0, 0},
+        {"priv", 0, 0, 0},
         {0, 0, 0, 0}
     };
 
@@ -201,6 +193,8 @@ int main(int argc, char **argv) {
                     }
                 } else if (strcmp(long_options[option_index].name, "config") == 0) {
                     config_end_node = true;
+                } else if (strcmp(long_options[option_index].name, "priv") == 0) {
+                    lorawan_public = false;
                 } else {
                     printf("ERROR: argument parsing options. Use -h to print help\n");
                     return EXIT_FAILURE;
@@ -238,6 +232,8 @@ int main(int argc, char **argv) {
         channelconf.freq_hz = ft;
         channelconf.datarate = sf;
         channelconf.bandwidth = bw_khz;
+        channelconf.rssi_offset = 0.0;
+        channelconf.sync_word = (lorawan_public == true) ? LORA_SYNC_WORD_PUBLIC : LORA_SYNC_WORD_PRIVATE;
         if (lgw_channel_rx_setconf(i, &channelconf) != 0) {
             printf("ERROR: failed to configure channel %u\n", i);
             return EXIT_FAILURE;
@@ -261,6 +257,7 @@ int main(int argc, char **argv) {
             txpk.no_crc = true;
             txpk.no_header = false;
             txpk.preamble = 8;
+            txpk.sync_word = (lorawan_public == true) ? LORA_SYNC_WORD_PUBLIC : LORA_SYNC_WORD_PRIVATE;
             txpk.rf_power = 0;
             txpk.size = 3;
 
