@@ -131,7 +131,7 @@ struct lgw_conf_channel_rx_s {
     e_bandwidth         bandwidth;      /*!> RX bandwidth */
     e_spreading_factor  datarate;       /*!> RX datarate */
     float               rssi_offset;    /*!> RSSI offset to be applied on this channel */
-    uint8_t             sync_word;      /*!> Public/LoRaWAN network:0x21, Private network:0x12 */
+    uint8_t             sync_word;      /*!> Public network:0x21, Private network:0x12 */
 };
 
 /**

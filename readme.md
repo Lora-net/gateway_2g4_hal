@@ -133,9 +133,13 @@ the adaptation board, in order to properly drive the MCU_RESET and MCU_BOOT0 pin
 
 ## 7. Changelog
 
+### v1.0.1 ###
+
+* Minor documentation updates
+
 ### v1.0.0 ###
 
-* HAL: Updated RX radio configuration to use propre preamble length for SF5 and
+* HAL: Updated RX radio configuration to use proper preamble length for SF5 and
 SF6 spreading factors.
 * Updated License description and file headers.
 
@@ -144,15 +148,15 @@ SF6 spreading factors.
 * HAL: lgw_get_temperature() either the temperature measured by an external
 sensor if available, or use the concentrator's MCU internal sensor. The function
 indicates the source from which comes the given temperature.
-* HAL: Allows to choose the LoRa sync word to be used. 0x21 for public LoRaWAN
-networks, 0x12 for private networks.
-* Packet Forwarder: Added a lorawan_public field in the JSON configuration file
-to set the sync word to be used (public or private).
+* HAL: Allows to choose the LoRa sync word to be used. 0x21 for public networks,
+0x12 for private networks.
+* Packet Forwarder: Added a field in the JSON configuration file to set the
+sync word to be used (public or private).
 
 ### v0.2.2 ###
 
-* Packet Forwarder: allow SF5 and SF6 to comply with DR6 and DR7 of LoRaWAN
-Global 2.4GHz region.
+* Packet Forwarder: allow SF5 and SF6 to comply with DR6 and DR7 of LoRa Global
+2.4GHz region.
 
 ### v0.2.1 ###
 
