@@ -133,45 +133,9 @@ the adaptation board, in order to properly drive the MCU_RESET and MCU_BOOT0 pin
 
 ## 7. Changelog
 
-### v1.0.1 ###
+### v1.0.2 ###
 
-* Minor documentation updates
-
-### v1.0.0 ###
-
-* HAL: Updated RX radio configuration to use proper preamble length for SF5 and
-SF6 spreading factors.
-* Updated License description and file headers.
-
-### v0.3.0 ###
-
-* HAL: lgw_get_temperature() either the temperature measured by an external
-sensor if available, or use the concentrator's MCU internal sensor. The function
-indicates the source from which comes the given temperature.
-* HAL: Allows to choose the LoRa sync word to be used. 0x21 for public networks,
-0x12 for private networks.
-* Packet Forwarder: Added a field in the JSON configuration file to set the
-sync word to be used (public or private).
-
-### v0.2.2 ###
-
-* Packet Forwarder: allow SF5 and SF6 to comply with DR6 and DR7 of LoRa Global
-2.4GHz region.
-
-### v0.2.1 ###
-
-* Added LICENSE.TXT file in root directory
-* HAL: improved uniqueness of the EUI returned by lgw_get_eui().
-* HAL: implemented lgw_abort_tx() function.
-
-### v0.2.0 ###
-
-* HAL: Updated radio initialization sequence to match with ref. design v2
-* MCU: Updated fw to v00.02.16
-
-### v0.1.0 ###
-
-* HAL: Initial version
+* Initial release for LoRa 2.4Ghz gateway
 
 ## 8. License
 
