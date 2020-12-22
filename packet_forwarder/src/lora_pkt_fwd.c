@@ -1318,8 +1318,8 @@ void thread_up(void) {
 
                 /* Packet ECC coding rate, 11-13 useful chars */
                 switch (p->coderate) {
-                    case CR_LORA_LI_4_7:
-                        memcpy((void *)(buff_up + buff_index), (void *)",\"codr\":\"4/7LI\"", 15);
+                    case CR_LORA_LI_4_8:
+                        memcpy((void *)(buff_up + buff_index), (void *)",\"codr\":\"4/8LI\"", 15);
                         buff_index += 15;
                         break;
                     default:
@@ -1683,8 +1683,8 @@ void thread_down(void) {
                 json_value_free(root_val);
                 continue;
             }
-            if ((strcmp(str, "4/7LI") == 0) || (strcmp(str, "4/8") == 0)) {
-                txpkt.coderate = CR_LORA_LI_4_7;
+            if ((strcmp(str, "4/8LI") == 0) || (strcmp(str, "4/7LI") == 0)) {
+                txpkt.coderate = CR_LORA_LI_4_8;
             } else {
                 MSG("WARNING: [down] format error in \"txpk.codr\", TX aborted\n");
                 json_value_free(root_val);

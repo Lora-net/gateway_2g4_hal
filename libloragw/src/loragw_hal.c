@@ -282,7 +282,7 @@ int lgw_receive(uint8_t max_pkt, struct lgw_pkt_rx_s * pkt_data) {
         pkt_data[i].modulation = MOD_LORA;
         pkt_data[i].bandwidth = rx_channel[pkt_data[i].channel].bandwidth;
         pkt_data[i].datarate = rx_channel[pkt_data[i].channel].datarate;
-        pkt_data[i].coderate = CR_LORA_LI_4_7;
+        pkt_data[i].coderate = CR_LORA_LI_4_8;
 
         /* Apply RSSI offset calibrated for the board/channel*/
         pkt_data[i].rssi += rx_channel[pkt_data[i].channel].rssi_offset;

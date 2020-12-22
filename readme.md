@@ -33,7 +33,7 @@ Please refer to util_boot/readme.md for more information about how to flash it.
 Those programs are included in the project to provide examples on how to use
 the HAL library, and to help the system builder test different parts of it.
 
-### 3.1. packet_frowarder
+### 3.1. packet_forwarder
 
 The packet forwarder is a program running on the host of a Lora gateway that
 forwards RF packets receive by the concentrator to a server through a IP/UDP
@@ -132,6 +132,26 @@ This script is to be used when using the gateway board on a Raspberry Pi through
 the adaptation board, in order to properly drive the MCU_RESET and MCU_BOOT0 pins.
 
 ## 7. Changelog
+
+### v1.1.0 ###
+
+> #### Notes
+
+* This intermediate release aims to fix the wrong naming issue for coding rate,
+and be aligned with the network servers which correcly use 4/8LI instead of
+4/7LI.
+
+> #### Changes
+
+* HAL: Fixed coding rate enum e_coding_rate for 4/8LI which was wrongly named
+4/7LI. 4/7LI doesn't exist and was wrongly described in the sx1280
+datasheet. The actual physical coding rate is 4/8LI.
+* Packet Forwarder: Set uplink coding rate to "4/8LI" instead of "4/7LI" in the
+"rxpk" JSON frame, as it should be expected by the Network Server.
+* Packet Forwarder: Accept both "4/7LI" and "4/8LI" as coding rate in the
+downlink request "txpk" JSON frame. The network server should use "4/8LI" but
+keep compatible with "4/7LI".
+* net_downlink: Updated default and expected coding rate from 4/7LI to 4/8LI
 
 ### v1.0.2 ###
 

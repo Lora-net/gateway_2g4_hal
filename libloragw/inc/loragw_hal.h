@@ -77,7 +77,7 @@ typedef enum {
     CR_LORA_4_8    = 0x04,
     CR_LORA_LI_4_5 = 0x05,
     CR_LORA_LI_4_6 = 0x06,
-    CR_LORA_LI_4_7 = 0x07
+    CR_LORA_LI_4_8 = 0x07
 } e_coding_rate;
 
 typedef enum {

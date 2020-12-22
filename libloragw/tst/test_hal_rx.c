@@ -90,8 +90,8 @@ int main(int argc, char **argv) {
     uint32_t ft = 2425000000;
     e_spreading_factor sf = DR_LORA_SF12;
     e_bandwidth bw_khz = BW_800KHZ;
-    unsigned int nb_loop = 1, cnt_loop;
-    int nb_pkt, nb_pkt_total = 0;
+    unsigned int nb_loop = 0, cnt_loop;
+    int nb_pkt = 0, nb_pkt_total = 0;
     unsigned long rx_delay = RX_DELAY_MS;
 
     struct lgw_conf_board_s boardconf;
@@ -240,7 +240,12 @@ int main(int argc, char **argv) {
         }
     }
 
-    for (cnt_loop = 0; (cnt_loop < nb_loop) && (quit_sig != 1) && (exit_sig != 1); cnt_loop++) {
+
+    /* Loop until user quits */
+    cnt_loop = 0;
+    while ((quit_sig != 1) && (exit_sig != 1)) {
+        cnt_loop += 1;
+
         /* Connect, configure and start the LoRa concentrator */
         if (lgw_start() != 0) {
             return EXIT_FAILURE;
@@ -250,7 +255,7 @@ int main(int argc, char **argv) {
         if (config_end_node == true) {
             txpk.freq_hz = 2403000000;
             txpk.tx_mode = IMMEDIATE;
-            txpk.coderate = CR_LORA_LI_4_7;
+            txpk.coderate = CR_LORA_LI_4_8;
             txpk.datarate = 5;
             txpk.bandwidth = BW_800KHZ;
             txpk.invert_pol = true;
@@ -294,7 +299,8 @@ int main(int argc, char **argv) {
         }
 
         /* Start receiving packets */
-        while ((quit_sig != 1) && (exit_sig != 1)) {
+        nb_pkt_total = 0;
+        while (((nb_pkt_total < (int)nb_loop) || nb_loop == 0) && (quit_sig != 1) && (exit_sig != 1)) {
             nb_pkt = lgw_receive(NB_PKT_MAX, pkt);
             if (nb_pkt == -1) {
                 printf("ERROR: lgw_receive failed\n");
@@ -305,7 +311,7 @@ int main(int argc, char **argv) {
             } else {
                 gettimeofday(&now, NULL);
                 nb_pkt_total += nb_pkt;
-                printf("%ld.%06ld: Received %d packets\n", now.tv_sec, now.tv_usec, nb_pkt_total);
+                printf("%ld.%06ld: Received %d packets total:%d loop:%u\n", now.tv_sec, now.tv_usec, nb_pkt, nb_pkt_total, cnt_loop);
                 for (i = 0; i < nb_pkt; i++) {
                     printf("pkt[%d]:{count:%u,size:%u,rssi:%.0f,snr:%.0f,foff:%i,data:", i, pkt[i].count_us, pkt[i].size, pkt[i].rssi, pkt[i].snr, pkt[i].foff_hz);
                     for (j = 0; j < pkt[i].size; j++) {

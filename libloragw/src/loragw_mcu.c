@@ -821,7 +821,7 @@ int mcu_prepare_tx(int fd, const struct lgw_pkt_tx_s * pkt_data, bool blocking) 
         case CR_LORA_LI_4_6:
             buf_req[REQ_PREPARE_TX__CR] = 5;
             break;
-        case CR_LORA_LI_4_7:
+        case CR_LORA_LI_4_8:
             buf_req[REQ_PREPARE_TX__CR] = 6;
             break;
         default:

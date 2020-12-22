@@ -168,7 +168,7 @@ int main(int argc, char **argv) {
                             pkt.coderate = CR_LORA_LI_4_6;
                             break;
                         case 7:
-                            pkt.coderate = CR_LORA_LI_4_7;
+                            pkt.coderate = CR_LORA_LI_4_8;
                             break;
                         default:
                             printf("ERROR: argument parsing of -b argument. Use -h to print help\n");

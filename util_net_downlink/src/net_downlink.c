@@ -67,7 +67,7 @@
 /* Constants */
 #define DEFAULT_LORA_BW             800     /* LoRa modulation bandwidth, kHz */
 #define DEFAULT_LORA_SF             12      /* LoRa SF */
-#define DEFAULT_LORA_CR             "4/7LI" /* LoRa CR */
+#define DEFAULT_LORA_CR             "4/8LI" /* LoRa CR */
 #define DEFAULT_LORA_PREAMBLE_SIZE  8       /* LoRa preamble size */
 #define DEFAULT_PAYLOAD_SIZE        4       /* payload size, bytes */
 #define PUSH_TIMEOUT_MS             100
@@ -904,7 +904,7 @@ static void usage( void )
     printf( " -m <string>       Modulation [\"LORA\"]\n" );
     printf( " -b <uint>         LoRa bandwidth in kHz [203, 406, 812, 1625]\n" );
     printf( " -s <uint>         LoRa Spreading Factor [5-12]\n" );
-    printf( " -c <string>       LoRa Coding Rate [\"4/5\", \"4/6\", \"4/7\", \"4/8\", \"4/5LI\", \"4/6LI\", \"4/7LI\"]\n" );
+    printf( " -c <string>       LoRa Coding Rate [\"4/5\", \"4/6\", \"4/7\", \"4/8\", \"4/5LI\", \"4/6LI\", \"4/8LI\"]\n" );
     printf( " -p <int>          RF power (dBm)\n" );
     printf( " -r <uint>         Preamble size (symbols, [6..65535])\n" );
     printf( " -z <uint>         Payload size (bytes, [0..255])\n" );
@@ -922,9 +922,9 @@ static void usage( void )
     printf( " Log uplinks into a CSV file, no downlink:\n" );
     printf( "   ./net_downlink -P 1730 -l log.csv\n" );
     printf( " Send downlinks, no logging:\n" );
-    printf( "   ./net_downlink -f 2422 -s 12 -b 812 -c \"4/7LI\" -r 8 -i -z 32 -t 500 -x 100 -P 1730\n" );
+    printf( "   ./net_downlink -f 2422 -s 12 -b 812 -c \"4/8LI\" -r 8 -i -z 32 -t 500 -x 100 -P 1730\n" );
     printf( " Log uplinks into CSV file while sending downlinks:\n" );
-    printf( "   ./net_downlink -f 2422 -s 12 -b 812 -c \"4/7LI\" -r 8 -i -z 32 -t 500 -x 100 -P 1730 -l log.csv\n" );
+    printf( "   ./net_downlink -f 2422 -s 12 -b 812 -c \"4/8LI\" -r 8 -i -z 32 -t 500 -x 100 -P 1730 -l log.csv\n" );
 }
 
 /* ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ */

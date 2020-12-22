@@ -95,7 +95,7 @@ int main(int argc, char **argv) {
     uint32_t ft = DEFAULT_FREQ_HZ;
     int8_t rf_power = 13;
     e_spreading_factor sf = DR_LORA_SF12;
-    e_coding_rate cr = CR_LORA_LI_4_7;
+    e_coding_rate cr = CR_LORA_LI_4_8;
     e_bandwidth bw_khz = BW_800KHZ;
     uint32_t nb_pkt = 1;
     uint8_t size = 0, size_min = 9, size_max = 253;
@@ -322,7 +322,7 @@ int main(int argc, char **argv) {
         if (config_end_node == true) {
             txpk.freq_hz = 2403000000;
             txpk.tx_mode = IMMEDIATE;
-            txpk.coderate = CR_LORA_LI_4_7;
+            txpk.coderate = CR_LORA_LI_4_8;
             txpk.datarate = 5;
             txpk.bandwidth = BW_800KHZ;
             txpk.invert_pol = true;
@@ -396,7 +396,7 @@ int main(int argc, char **argv) {
             pkt.freq_hz = ft;
             pkt.bandwidth = bw_khz;
             pkt.datarate = sf;
-            pkt.coderate = CR_LORA_LI_4_7;
+            pkt.coderate = CR_LORA_LI_4_8;
             pkt.invert_pol = invert_pol;
             pkt.no_crc = true;
             pkt.no_header = false;
@@ -447,6 +447,8 @@ int main(int argc, char **argv) {
                 }
             }
         }
+
+        printf ("Nb packets sent:%u loop:%u\n\n", nb_pkt, cnt_loop + 1);
 
         /* Stop the LoRa concentrator */
         if (lgw_stop() != 0) {
